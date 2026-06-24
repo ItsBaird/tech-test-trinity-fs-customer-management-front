@@ -35,7 +35,17 @@ const maxDateOfBirth = () => {
 const validate = (f) => {
   const e = {};
   if (!f.identificationType)          e.identificationType   = "Selecciona un tipo de identificación.";
-  if (!f.identificationNumber.trim()) e.identificationNumber = "El número de identificación es requerido.";
+  if (!f.identificationNumber.trim()) {
+  e.identificationNumber = "El número de identificación es requerido.";
+} else if (f.identificationNumber.trim().length > 25) {
+  e.identificationNumber = "Máximo 25 caracteres.";
+} else if (f.identificationType === "CC" || f.identificationType === "CE") {
+  if (!/^[0-9]+$/.test(f.identificationNumber.trim()))
+    e.identificationNumber = "CC y CE solo admiten dígitos numéricos.";
+} else if (f.identificationType === "PA") {
+  if (!/^[A-Za-z0-9]+$/.test(f.identificationNumber.trim()))
+    e.identificationNumber = "El pasaporte solo admite letras y números.";
+}
   if (!f.names.trim())                e.names    = "Los nombres son requeridos.";
   else if (f.names.trim().length < 2) e.names    = "Mínimo 2 caracteres.";
   if (!f.surnames.trim())                e.surnames = "Los apellidos son requeridos.";
@@ -158,16 +168,16 @@ const CustomerForm = ({ initialData = null, onSubmit, onCancel, isLoading = fals
           <Label>Número de identificación</Label>
           <input
             type="text"
-            inputMode="numeric"
+            maxLength={25}
+            inputMode={fields.identificationType === "PA" ? "text" : "numeric"}
             value={fields.identificationNumber}
             onChange={(e) => set("identificationNumber", e.target.value)}
             onBlur={() => blur("identificationNumber")}
-            placeholder="Ej: 1234567890"
+            placeholder={fields.identificationType === "PA" ? "Ej: AB123456" : "Ej: 1234567890"}
             className={inputBase(!!errors.identificationNumber)}
           />
           <ErrorMsg msg={errors.identificationNumber} />
         </div>
-
         {/* Nombres */}
         <div>
           <Label>Nombres</Label>

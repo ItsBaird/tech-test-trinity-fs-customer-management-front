@@ -1,15 +1,25 @@
+/**
+ * AccountDeleteModal — confirmación de eliminación de cuenta.
+ *
+ * Props:
+ *   account    {object|null}
+ *   onConfirm  {function}
+ *   onCancel   {function}
+ *   isLoading  {boolean}
+ */
 import Modal from "../../../components/ui/Modal";
 
-const CustomerDeleteModal = ({ customer, onConfirm, onCancel, isLoading = false }) => {
-  if (!customer) return null;
+const fmt = (n) =>
+  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
-  const fullName = `${customer.names} ${customer.surnames}`;
+const AccountDeleteModal = ({ account, onConfirm, onCancel, isLoading = false }) => {
+  if (!account) return null;
 
   return (
     <Modal
-      isOpen={Boolean(customer)}
+      isOpen={Boolean(account)}
       onClose={onCancel}
-      title="Eliminar cliente"
+      title="Eliminar cuenta"
       size="sm"
     >
       <div className="flex flex-col items-center text-center gap-4">
@@ -25,17 +35,25 @@ const CustomerDeleteModal = ({ customer, onConfirm, onCancel, isLoading = false 
 
         <div className="space-y-1.5">
           <p className="text-sm text-gray-700 leading-relaxed">
-            Estás a punto de eliminar a{" "}
-            <span className="font-semibold text-gray-900">{fullName}</span>.
+            Estás a punto de eliminar la cuenta{" "}
+            <span className="font-semibold font-mono text-gray-900">
+              {account.accountNumber}
+            </span>.
           </p>
+          {/* Advertir si tiene saldo */}
+          {parseFloat(account.balance) > 0 && (
+            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mt-2">
+              Esta cuenta tiene un saldo de{" "}
+              <span className="font-semibold">{fmt(account.balance)}</span>.
+              Asegúrate de procesar el saldo antes de eliminarla.
+            </p>
+          )}
           <p className="text-xs text-gray-500 leading-relaxed">
-            Esta acción no se puede deshacer. Si el cliente tiene cuentas
-            asociadas, no podrá eliminarse.
+            Esta acción no se puede deshacer.
           </p>
         </div>
       </div>
 
-      {/* Botones: apilados en mobile, lado a lado en sm+ */}
       <div className="flex flex-col-reverse sm:flex-row gap-3 mt-6">
         <button
           onClick={onCancel}
@@ -74,4 +92,4 @@ const CustomerDeleteModal = ({ customer, onConfirm, onCancel, isLoading = false 
   );
 };
 
-export default CustomerDeleteModal;
+export default AccountDeleteModal;

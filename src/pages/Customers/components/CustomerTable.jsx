@@ -25,9 +25,9 @@ const TypeBadge = ({ type }) => {
 /* ── Skeleton ── */
 const SkeletonRow = () => (
   <tr className="border-b border-gray-100 animate-pulse">
-    {Array.from({ length: 9 }).map((_, i) => (
+    {Array.from({ length: 8 }).map((_, i) => (
       <td key={i} className="px-4 py-3.5">
-        <div className="h-3 rounded-full bg-gray-100" style={{ width: i === 8 ? "3rem" : "75%" }} />
+        <div className="h-3 rounded-full bg-gray-100" style={{ width: i === 7 ? "3rem" : "75%" }} />
       </td>
     ))}
   </tr>
@@ -121,7 +121,6 @@ const CustomerCard = ({ customer: c, onEdit, onDelete }) => (
         <p className="font-semibold text-gray-900 truncate">
           {c.names} {c.surnames}
         </p>
-        <p className="text-xs text-gray-400 font-mono mt-0.5">#{c.id}</p>
       </div>
       <TypeBadge type={c.identificationType} />
     </div>
@@ -177,7 +176,7 @@ const CustomerCard = ({ customer: c, onEdit, onDelete }) => (
 /* ══════════════════════════════════════════════
    COMPONENTE PRINCIPAL
    ══════════════════════════════════════════════ */
-const COLUMNS = ["ID", "Tipo ID", "Número ID", "Nombres", "Apellidos", "Correo", "Nacimiento", "Creación", ""];
+const COLUMNS = ["Tipo ID", "Número ID", "Nombres", "Apellidos", "Correo", "Nacimiento", "Creación", ""];
 
 const CustomerTable = ({ customers = [], onEdit, onDelete, isLoading = false }) => {
   return (
@@ -226,10 +225,6 @@ const CustomerTable = ({ customers = [], onEdit, onDelete, isLoading = false }) 
                         ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/40"}
                       `}
                     >
-                      {/* ID */}
-                      <td className="px-4 py-3.5 text-gray-400 font-mono text-xs tabular-nums">
-                        #{c.id}
-                      </td>
                       {/* Tipo ID */}
                       <td className="px-4 py-3.5">
                         <TypeBadge type={c.identificationType} />
