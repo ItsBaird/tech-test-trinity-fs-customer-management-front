@@ -1,13 +1,3 @@
-/**
- * AccountTable — tabla desktop / cards mobile para cuentas.
- *
- * Props:
- *   accounts   {array}
- *   onEdit     {function}   recibe el objeto account
- *   onDelete   {function}   recibe el objeto account
- *   isLoading  {boolean}
- */
-
 const fmt = (n) =>
   new Intl.NumberFormat("es-CO", {
     style: "currency", currency: "COP", maximumFractionDigits: 0,
@@ -146,7 +136,6 @@ const AccountCard = ({ account: a, onEdit, onDelete }) => (
     <div className="flex items-start justify-between gap-2 mb-3">
       <div className="min-w-0">
         <p className="font-mono font-semibold text-gray-900 text-sm">{a.accountNumber}</p>
-        <p className="text-xs text-gray-400 mt-0.5">#{a.id}</p>
       </div>
       <div className="flex flex-col items-end gap-1">
         <TypeBadge type={a.accountType}/>
@@ -199,7 +188,7 @@ const AccountCard = ({ account: a, onEdit, onDelete }) => (
 );
 
 /* ── Componente principal ── */
-const COLUMNS = ["ID", "Número", "Tipo", "Estado", "Saldo", "GMF", "Cliente", "Creación", ""];
+const COLUMNS = ["Número", "Tipo", "Estado", "Saldo", "GMF", "Cliente", "Creación", ""];
 
 const AccountTable = ({ accounts = [], onEdit, onDelete, isLoading = false }) => (
   <>
@@ -241,7 +230,6 @@ const AccountTable = ({ accounts = [], onEdit, onDelete, isLoading = false }) =>
                       ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/40"}
                     `}
                   >
-                    <td className="px-4 py-3.5 text-gray-400 font-mono text-xs tabular-nums">#{a.id}</td>
                     <td className="px-4 py-3.5 font-mono text-xs font-semibold text-gray-800 whitespace-nowrap tabular-nums">{a.accountNumber}</td>
                     <td className="px-4 py-3.5"><TypeBadge type={a.accountType}/></td>
                     <td className="px-4 py-3.5"><StateBadge state={a.accountState}/></td>
