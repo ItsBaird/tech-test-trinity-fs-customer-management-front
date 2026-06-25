@@ -92,7 +92,7 @@ const Customers = () => {
   const [loading,     setLoading]     = useState(true);
 
   const [formOpen,    setFormOpen]    = useState(false);
-  const [editTarget,  setEditTarget]  = useState(null);   // null = crear
+  const [editTarget,  setEditTarget]  = useState(null);
   const [deleteTarget,setDeleteTarget]= useState(null);
 
   const [saving,      setSaving]      = useState(false);
@@ -105,7 +105,7 @@ const Customers = () => {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await api.getAll();
+      const data = await getAllCustomers();
       setCustomers(data);
     } catch {
       notify("No se pudieron cargar los clientes.", "error");
@@ -127,10 +127,10 @@ const Customers = () => {
     setSaving(true);
     try {
       if (editTarget) {
-        await api.patch(editTarget.id, payload);
+        await patchCustomer(editTarget.id, payload);
         notify("Cliente actualizado correctamente.");
       } else {
-        await api.create(payload);
+        await createCustomer(payload);
         notify("Cliente creado correctamente.");
       }
       setFormOpen(false);
@@ -156,7 +156,7 @@ const Customers = () => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await api.remove(deleteTarget.id);
+      await deleteCustomer(deleteTarget.id);
       notify(`${deleteTarget.names} ${deleteTarget.surnames} fue eliminado.`);
       setDeleteTarget(null);
       await fetchCustomers();
