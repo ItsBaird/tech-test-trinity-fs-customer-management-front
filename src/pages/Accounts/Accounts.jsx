@@ -1,12 +1,3 @@
-/**
- * Accounts.jsx — página principal de gestión de cuentas.
- *
- * API:
- *   GET    /accounts/api/getAll
- *   POST   /accounts/api/create       { accountType, gmfExempt, customerId }
- *   PATCH  /accounts/api/update/{id}  { accountState?, gmfExempt? }
- *   DELETE /accounts/api/delete/{id}
- */
 import { useState, useEffect, useCallback } from "react";
 import AccountTable       from "./components/AccountTable";
 import AccountForm        from "./components/AccountForm";
@@ -14,7 +5,6 @@ import AccountEditModal   from "./components/AccountEditModal";
 import AccountDeleteModal from "./components/AccountDeleteModal";
 import Modal              from "../../components/ui/Modal";
 
-/* ─── API ─── */
 const BASE_URL = "http://localhost:8080";
 
 const api = {
