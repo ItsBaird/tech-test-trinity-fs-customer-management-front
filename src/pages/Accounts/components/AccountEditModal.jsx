@@ -1,13 +1,3 @@
-/**
- * AccountEditModal — modal para editar estado y GMF de una cuenta.
- * Campos del AccountPatchRequest: accountState, gmfExempt.
- *
- * Props:
- *   account    {object|null}  cuenta a editar; null = cerrado
- *   onSubmit   {function}     payload { accountState, gmfExempt }
- *   onCancel   {function}
- *   isLoading  {boolean}
- */
 import { useState, useEffect } from "react";
 import Modal from "../../../components/ui/Modal";
 

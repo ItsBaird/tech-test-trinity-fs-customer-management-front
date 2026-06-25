@@ -1,12 +1,3 @@
-/**
- * AccountDeleteModal — confirmación de eliminación de cuenta.
- *
- * Props:
- *   account    {object|null}
- *   onConfirm  {function}
- *   onCancel   {function}
- *   isLoading  {boolean}
- */
 import Modal from "../../../components/ui/Modal";
 
 const fmt = (n) =>

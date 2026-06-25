@@ -1,13 +1,3 @@
-/**
- * AccountForm — formulario para CREAR una cuenta.
- * Solo campos del AccountCreateRequest: accountType, gmfExempt, customerId.
- * El número, estado y balance los genera el backend automáticamente.
- *
- * Props:
- *   onSubmit    {function}  payload validado { accountType, gmfExempt, customerId }
- *   onCancel    {function}
- *   isLoading   {boolean}
- */
 import { useState, useEffect } from "react";
 
 const BASE_URL = "http://localhost:8080";
