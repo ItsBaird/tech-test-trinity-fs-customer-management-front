@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-
-const BASE_URL = "http://localhost:8080";
+import { getAllCustomers } from "../../../services/customerService";
 
 const ACCOUNT_TYPES = [
   { value: "AHORROS",   label: "Cuenta de Ahorros" },
@@ -15,12 +14,11 @@ const EMPTY = {
 
 const validate = (f) => {
   const e = {};
-  if (!f.accountType)  e.accountType  = "Selecciona el tipo de cuenta.";
-  if (!f.customerId)   e.customerId   = "Selecciona un cliente.";
+  if (!f.accountType) e.accountType = "Selecciona el tipo de cuenta.";
+  if (!f.customerId)  e.customerId  = "Selecciona un cliente.";
   return e;
 };
 
-/* ── Helpers visuales ── */
 const ErrorMsg = ({ msg }) =>
   msg ? (
     <p className="mt-1 flex items-center gap-1 text-xs text-red-600">
@@ -48,20 +46,19 @@ const Label = ({ children }) => (
 
 /* ── Componente principal ── */
 const AccountForm = ({ onSubmit, onCancel, isLoading = false }) => {
-  const [fields,   setFields]   = useState(EMPTY);
-  const [errors,   setErrors]   = useState({});
-  const [touched,  setTouched]  = useState({});
-  const [customers, setCustomers] = useState([]);
+  const [fields,           setFields]           = useState(EMPTY);
+  const [errors,           setErrors]           = useState({});
+  const [touched,          setTouched]          = useState({});
+  const [customers,        setCustomers]        = useState([]);
   const [loadingCustomers, setLoadingCustomers] = useState(true);
   const [customersError,   setCustomersError]   = useState(false);
+  const [search,           setSearch]           = useState("");
+  const [dropdownOpen,     setDropdownOpen]     = useState(false);
 
-  /* Cargar clientes para el select */
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/customers/api/getAll`);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
+        const data = await getAllCustomers();
         setCustomers(data);
       } catch {
         setCustomersError(true);
@@ -71,6 +68,35 @@ const AccountForm = ({ onSubmit, onCancel, isLoading = false }) => {
     };
     fetchCustomers();
   }, []);
+
+  /* Filtrar por número de identificación, nombre o apellido */
+  const filtered = search.trim()
+    ? customers.filter((c) =>
+        c.identificationNumber.includes(search.trim()) ||
+        `${c.names} ${c.surnames}`.toLowerCase().includes(search.trim().toLowerCase())
+      )
+    : customers;
+
+  const selectedCustomer = customers.find((c) => String(c.id) === String(fields.customerId));
+
+  const selectCustomer = (c) => {
+    const next = { ...fields, customerId: String(c.id) };
+    setFields(next);
+    setSearch("");
+    setDropdownOpen(false);
+    if (touched.customerId) {
+      setErrors((prev) => ({ ...prev, customerId: validate(next).customerId }));
+    }
+  };
+
+  const clearCustomer = () => {
+    const next = { ...fields, customerId: "" };
+    setFields(next);
+    setSearch("");
+    if (touched.customerId) {
+      setErrors((prev) => ({ ...prev, customerId: validate(next).customerId }));
+    }
+  };
 
   const set = (key, value) => {
     const next = { ...fields, [key]: value };
@@ -120,9 +146,10 @@ const AccountForm = ({ onSubmit, onCancel, isLoading = false }) => {
           <ErrorMsg msg={errors.accountType} />
         </div>
 
-        {/* Cliente — ancho completo */}
+        {/* Cliente con búsqueda*/}
         <div className="sm:col-span-2">
           <Label>Cliente titular</Label>
+
           {loadingCustomers ? (
             <div className="w-full rounded-lg border border-gray-200 px-3 py-2.5 bg-gray-50 animate-pulse">
               <div className="h-4 bg-gray-200 rounded w-1/2" />
@@ -131,25 +158,100 @@ const AccountForm = ({ onSubmit, onCancel, isLoading = false }) => {
             <p className="text-xs text-red-500 mt-1">
               No se pudieron cargar los clientes. Recarga la página.
             </p>
+          ) : selectedCustomer ? (
+            /* Cliente ya seleccionado — mostrar pill con opción de limpiar */
+            <div className={`
+              flex items-center justify-between gap-2
+              rounded-lg border px-3 py-2.5 bg-white
+              ${errors.customerId
+                ? "border-red-300 bg-red-50/40"
+                : "border-[#16A34A] bg-[#DCFCE7]/40"
+              }
+            `}>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {selectedCustomer.names} {selectedCustomer.surnames}
+                </p>
+                <p className="text-xs text-gray-500 font-mono">
+                  {selectedCustomer.identificationType} {selectedCustomer.identificationNumber}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={clearCustomer}
+                className="shrink-0 w-6 h-6 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                title="Cambiar cliente"
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
           ) : (
-            <select
-              value={fields.customerId}
-              onChange={(e) => set("customerId", e.target.value)}
-              onBlur={() => blur("customerId")}
-              className={inputBase(!!errors.customerId)}
-            >
-              <option value="">Seleccionar cliente…</option>
-              {customers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.names} {c.surnames} — {c.identificationType} {c.identificationNumber}
-                </option>
-              ))}
-            </select>
+            /* Buscador y dropdown */
+            <div className="relative">
+              <div className="relative">
+                <svg
+                  width="15" height="15" viewBox="0 0 24 24" fill="none"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                >
+                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setDropdownOpen(true); }}
+                  onFocus={() => setDropdownOpen(true)}
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setDropdownOpen(false);
+                      setTouched((prev) => ({ ...prev, customerId: true }));
+                      setErrors((prev) => ({ ...prev, customerId: validate(fields).customerId }));
+                    }, 150);
+                  }}
+                  placeholder="Buscar por cédula o nombre…"
+                  className={`${inputBase(!!errors.customerId)} pl-9`}
+                />
+              </div>
+
+              {dropdownOpen && (
+                <ul className="
+                  absolute z-20 mt-1 w-full
+                  bg-white border border-gray-200 rounded-xl shadow-lg
+                  max-h-48 overflow-y-auto
+                ">
+                  {filtered.length === 0 ? (
+                    <li className="px-4 py-3 text-xs text-gray-400 text-center">
+                      Sin resultados
+                    </li>
+                  ) : (
+                    filtered.map((c) => (
+                      <li
+                        key={c.id}
+                        onMouseDown={() => selectCustomer(c)}
+                        className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[#DCFCE7]/60 transition-colors"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {c.names} {c.surnames}
+                          </p>
+                          <p className="text-xs text-gray-500 font-mono">
+                            {c.identificationType} {c.identificationNumber}
+                          </p>
+                        </div>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
           )}
+
           <ErrorMsg msg={errors.customerId} />
         </div>
 
-        {/* GMF Exento — toggle checkbox estilizado */}
+        {/* GMF Exento */}
         <div className="sm:col-span-2">
           <label className="flex items-start gap-3 cursor-pointer group">
             <div className="relative mt-0.5 shrink-0">

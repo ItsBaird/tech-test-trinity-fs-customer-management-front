@@ -4,49 +4,12 @@ import AccountForm        from "./components/AccountForm";
 import AccountEditModal   from "./components/AccountEditModal";
 import AccountDeleteModal from "./components/AccountDeleteModal";
 import Modal              from "../../components/ui/Modal";
-
-const BASE_URL = "http://localhost:8080";
-
-const api = {
-  getAll: async () => {
-    const res = await fetch(`${BASE_URL}/accounts/api/getAll`);
-    if (!res.ok) throw new Error("Error al obtener las cuentas.");
-    return res.json();
-  },
-  create: async (data) => {
-    const res = await fetch(`${BASE_URL}/accounts/api/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message ?? "Error al crear la cuenta.");
-    }
-    return res.json();
-  },
-  patch: async (id, data) => {
-    const res = await fetch(`${BASE_URL}/accounts/api/update/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message ?? "Error al actualizar la cuenta.");
-    }
-    return res.json();
-  },
-  remove: async (id) => {
-    const res = await fetch(`${BASE_URL}/accounts/api/delete/${id}`, {
-      method: "DELETE",
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message ?? "Error al eliminar la cuenta.");
-    }
-  },
-};
+import {
+  getAllAccounts,
+  createAccount,
+  patchAccount,
+  deleteAccount,
+} from "../../services/accountService";
 
 /* ─── Toast ─── */
 const Toast = ({ message, type = "success", onClose }) => {
@@ -126,7 +89,7 @@ const Accounts = () => {
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await api.getAll();
+      const data = await getAllAccounts();
       setAccounts(data);
     } catch {
       notify("No se pudieron cargar las cuentas.", "error");
@@ -141,7 +104,7 @@ const Accounts = () => {
   const handleCreate = async (payload) => {
     setSaving(true);
     try {
-      await api.create(payload);
+      await createAccount(payload);
       notify("Cuenta creada correctamente.");
       setFormOpen(false);
       await fetchAccounts();
@@ -165,7 +128,7 @@ const Accounts = () => {
   const handleSaveEdit = async (payload) => {
     setSaving(true);
     try {
-      await api.patch(editTarget.id, payload);
+      await patchAccount(editTarget.id, payload);
       notify("Cuenta actualizada correctamente.");
       setEditTarget(null);
       await fetchAccounts();
@@ -190,7 +153,7 @@ const Accounts = () => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await api.remove(deleteTarget.id);
+      await deleteAccount(deleteTarget.id);
       notify(`Cuenta ${deleteTarget.accountNumber} eliminada.`);
       setDeleteTarget(null);
       await fetchAccounts();
