@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'https://tech-test-trinity-fs-customer-management.onrender.com';
 
 export const getAllTransactions = async () => {
   const res = await fetch(`${BASE_URL}/transactions/api/getAll`);

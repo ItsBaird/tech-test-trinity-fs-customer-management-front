@@ -38,7 +38,7 @@ const formatDate = (dateStr) => {
 /* ─── Skeleton row ─── */
 const SkeletonRow = () => (
   <tr className="border-b border-gray-100 last:border-0">
-    {[...Array(6)].map((_, i) => (
+    {[...Array(5)].map((_, i) => (
       <td key={i} className="px-4 py-3">
         <div
           className="h-4 bg-gray-100 rounded-md animate-pulse"
@@ -52,7 +52,7 @@ const SkeletonRow = () => (
 /* ─── Empty state ─── */
 const EmptyState = () => (
   <tr>
-    <td colSpan={6}>
+    <td colSpan={5}>
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-gray-400">
@@ -85,7 +85,6 @@ const TransactionRow = ({ tx }) => {
 
   return (
     <tr className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
-      <td className="px-4 py-3 text-gray-400 tabular-nums">#{tx.id}</td>
 
       <td className="px-4 py-3">
         <span
@@ -101,11 +100,11 @@ const TransactionRow = ({ tx }) => {
       </td>
 
       <td className="px-4 py-3 text-gray-600 tabular-nums">
-        {tx.sourceAccountId ?? <span className="text-gray-300">—</span>}
+        {tx.sourceAccountNumber ?? <span className="text-gray-300">—</span>}
       </td>
 
       <td className="px-4 py-3 text-gray-600 tabular-nums">
-        {tx.destinationAccountId ?? <span className="text-gray-300">—</span>}
+        {tx.destinationAccountNumber ?? <span className="text-gray-300">—</span>}
       </td>
 
       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
@@ -128,8 +127,7 @@ const TransactionCard = ({ tx }) => {
     <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <span className="text-xs text-gray-400">ID #{tx.id}</span>
-          <p className="text-base font-semibold text-gray-900 mt-0.5">
+          <p className="text-base font-semibold text-gray-900">
             {formatCurrency(tx.amount)}
           </p>
         </div>
@@ -144,11 +142,11 @@ const TransactionCard = ({ tx }) => {
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div>
           <p className="text-gray-400 mb-0.5">Cuenta origen</p>
-          <p className="font-medium text-gray-700">{tx.sourceAccountId ?? "—"}</p>
+          <p className="font-medium text-gray-700">{tx.sourceAccountNumber ?? "—"}</p>
         </div>
         <div>
           <p className="text-gray-400 mb-0.5">Cuenta destino</p>
-          <p className="font-medium text-gray-700">{tx.destinationAccountId ?? "—"}</p>
+          <p className="font-medium text-gray-700">{tx.destinationAccountNumber ?? "—"}</p>
         </div>
       </div>
 
@@ -164,7 +162,6 @@ const MobileSkeletonCard = () => (
   <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3 animate-pulse">
     <div className="flex justify-between">
       <div className="space-y-1.5">
-        <div className="h-3 w-16 bg-gray-100 rounded" />
         <div className="h-5 w-28 bg-gray-100 rounded" />
       </div>
       <div className="h-6 w-24 bg-gray-100 rounded-full" />
@@ -197,7 +194,7 @@ const MobileEmptyState = () => (
 );
 
 /* ─── Main component ─── */
-const HEADERS = ["ID", "Tipo", "Monto", "Cuenta origen", "Cuenta destino", "Fecha"];
+const HEADERS = ["Tipo", "Monto", "Cuenta origen", "Cuenta destino", "Fecha"];
 
 const TransactionTable = ({ transactions = [], isLoading = false }) => {
   return (
